@@ -15,7 +15,7 @@ RUN uv sync --no-dev --no-install-project
 
 COPY . .
 
-# Ya NO ejecutamos uv sync otra vez
-# RUN uv sync --locked --no-dev --no-editable   ← ELIMINADO
+# ESTA ES LA LÍNEA QUE FALTABA
+RUN uv sync --no-dev
 
 CMD ["uv", "run", "bot.py"]
