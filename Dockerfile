@@ -8,14 +8,18 @@ ENV UV_PYTHON_DOWNLOADS=never \
     UV_COMPILE_BYTECODE=1 \
     UV_NO_SYNC=1
 
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml ./
 
+# Generar lockfile nuevo
 RUN uv lock
-RUN uv sync --no-dev --no-install-project
 
+# Instalar dependencias del proyecto
+RUN uv sync --no-dev
+
+# Copiar el código
 COPY . .
 
-# ESTA ES LA LÍNEA QUE FALTABA
+# Instalar el proyecto completo (incluye telegram, urllib3, six, etc.)
 RUN uv sync --no-dev
 
 CMD ["uv", "run", "bot.py"]
