@@ -1,2 +1,2 @@
 [deploy]
-startCommand = "uv run python bot.py"
+startCommand = "pip install -r requirements.txt && python bot.py"
