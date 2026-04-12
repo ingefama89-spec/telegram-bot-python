@@ -32,4 +32,4 @@ COPY . .
 RUN uv sync --locked --no-dev --no-editable
 
 # Run bot
-CMD ["uv", "run", "main.py"]
+CMD ["uv", "run", "bot.py"]
