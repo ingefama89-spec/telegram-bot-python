@@ -5,6 +5,9 @@ WORKDIR /app
 # Instalar pip y uv
 RUN pip install --no-cache-dir --upgrade pip uv==0.5.29
 
+# Crear entorno virtual uv
+RUN uv venv
+
 # Variables de entorno para uv
 ENV UV_PYTHON_DOWNLOADS=never \
     UV_COMPILE_BYTECODE=1 \
@@ -13,7 +16,7 @@ ENV UV_PYTHON_DOWNLOADS=never \
 # Copiar pyproject
 COPY pyproject.toml ./
 
-# ⭐ FORZAR instalación de python-telegram-bot 13.14
+# ⭐ Forzar instalación de python-telegram-bot 13.14 dentro del venv
 RUN uv pip install python-telegram-bot==13.14
 
 # Crear lockfile e instalar dependencias
