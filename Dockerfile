@@ -2,6 +2,9 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Limpiar cualquier venv previo
+RUN rm -rf /app/.venv
+
 # Instalar pip y uv
 RUN pip install --no-cache-dir --upgrade pip uv==0.5.29
 
@@ -16,7 +19,7 @@ ENV UV_PYTHON_DOWNLOADS=never \
 # Copiar pyproject
 COPY pyproject.toml ./
 
-# ⭐ Forzar instalación de python-telegram-bot 13.14 dentro del venv
+# ⭐ Forzar instalación de python-telegram-bot 13.14
 RUN uv pip install python-telegram-bot==13.14
 
 # Crear lockfile e instalar dependencias
