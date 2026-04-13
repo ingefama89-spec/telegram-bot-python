@@ -3,7 +3,6 @@ FROM python:3.10-slim
 WORKDIR /app
 
 RUN pip install --no-cache-dir --upgrade pip uv==0.5.29
-RUN pip install --no-cache-dir setuptools
 
 ENV UV_PYTHON_DOWNLOADS=never \
     UV_COMPILE_BYTECODE=1 \
@@ -17,5 +16,8 @@ RUN uv sync --no-dev
 COPY . .
 
 RUN uv sync --no-dev
+
+# ESTA ES LA LÍNEA QUE FALTABA
+RUN uv pip install setuptools
 
 CMD ["uv", "run", "bot.py"]
