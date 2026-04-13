@@ -31,15 +31,44 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(MQTT_TOPIC)
 
 def on_message(client, userdata, msg):
-    mensaje = msg.payload.decode()
-    print("Mensaje MQTT recibido:", mensaje)
+    import json
+    from datetime import datetime
+
+    mensaje_raw = msg.payload.decode()
+    print("Mensaje MQTT recibido:", mensaje_raw)
+
+    # Intentar parsear JSON
+    try:
+        data = json.loads(mensaje_raw)
+        sensor = data.get("sensor", "Desconocido")
+        nivel = data.get("nivel", "N/A")
+        tipo = data.get("tipo", "N/A")
+        mensaje = data.get("mensaje", mensaje_raw)
+    except:
+        # Si no es JSON, enviar texto plano
+        sensor = "Desconocido"
+        nivel = "N/A"
+        tipo = "Mensaje simple"
+        mensaje = mensaje_raw
+
+    # Fecha y hora actual
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    texto = (
+        f"🐠 *Sistema Acuario*\n"
+        f"📅 *Fecha:* {fecha}\n"
+        f"📍 *Sensor:* {sensor}\n"
+        f"💧 *Nivel del agua:* {nivel}\n"
+        f"⚠️ *Tipo de alerta:* {tipo}\n"
+        f"🔔 *Mensaje:* {mensaje}"
+    )
 
     from telegram import Bot
     bot = Bot(token=TELEGRAM_TOKEN)
     bot.send_message(
         chat_id=CHAT_ID,
-        text=f"📡 MQTT: {mensaje}",
-        parse_mode=None   # ← CORREGIDO: sin Markdown
+        text=texto,
+        parse_mode="Markdown"
     )
 
 # ============================
