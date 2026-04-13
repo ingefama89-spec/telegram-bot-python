@@ -38,8 +38,8 @@ def on_message(client, userdata, msg):
     bot = Bot(token=TELEGRAM_TOKEN)
     bot.send_message(
         chat_id=CHAT_ID,
-        text=f"📡 *MQTT:* {mensaje}",
-        parse_mode=ParseMode.MARKDOWN
+        text=f"📡 MQTT: {mensaje}",
+        parse_mode=None   # ← CORREGIDO: sin Markdown
     )
 
 # ============================
