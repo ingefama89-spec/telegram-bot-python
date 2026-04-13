@@ -60,7 +60,9 @@ def main():
     client = mqtt.Client()
     client.tls_set()  # TLS obligatorio para HiveMQ Cloud
     client.username_pw_set(MQTT_USER, MQTT_PASS)
-
+    
+    client.reconnect_delay_set(min_delay=1, max_delay=30)
+    
     client.on_connect = on_connect
     client.on_message = on_message
 
