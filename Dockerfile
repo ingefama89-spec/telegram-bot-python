@@ -13,6 +13,9 @@ ENV UV_PYTHON_DOWNLOADS=never \
 # Copiar pyproject
 COPY pyproject.toml ./
 
+# ⭐ FORZAR instalación de python-telegram-bot 13.14
+RUN uv pip install python-telegram-bot==13.14
+
 # Crear lockfile e instalar dependencias
 RUN uv lock
 RUN uv sync --no-dev
@@ -23,7 +26,7 @@ COPY . .
 # Sincronizar dependencias del proyecto
 RUN uv sync --no-dev
 
-# ⭐ INSTALAR SETUPTOOLS DENTRO DEL ENTORNO UV
+# Instalar setuptools dentro del entorno uv
 RUN uv pip install setuptools
 
 CMD ["uv", "run", "bot.py"]
