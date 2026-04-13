@@ -15,7 +15,6 @@ RUN uv sync --no-dev
 
 COPY . .
 
-# ESTA LÍNEA ES LA QUE FALTABA
 RUN uv sync --no-dev
 
 CMD ["uv", "run", "bot.py"]
