@@ -14,6 +14,13 @@ MQTT_BROKER = os.getenv("MQTT_BROKER")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
 
+# Topic para enviar comandos al ESP8266
+MQTT_COMMAND_TOPIC = os.getenv("MQTT_COMMAND_TOPIC", "acuario/comandos")
+
+# Cliente MQTT global para usar dentro de los comandos
+mqtt_client = None
+
+
 # ============================
 # HANDLERS DE TELEGRAM
 # ============================
@@ -22,6 +29,22 @@ def start(update, context):
 
 def estado(update, context):
     update.message.reply_text("Sistema funcionando correctamente.")
+
+def encender(update, context):
+    update.message.reply_text("🔌 Encendiendo bomba (comando enviado por MQTT).")
+    if mqtt_client:
+        mqtt_client.publish(MQTT_COMMAND_TOPIC, "encender")
+
+def apagar(update, context):
+    update.message.reply_text("⛔ Apagando bomba (comando enviado por MQTT).")
+    if mqtt_client:
+        mqtt_client.publish(MQTT_COMMAND_TOPIC, "apagar")
+
+def reset_cmd(update, context):
+    update.message.reply_text("♻️ Reset de fallas solicitado (enviado por MQTT).")
+    if mqtt_client:
+        mqtt_client.publish(MQTT_COMMAND_TOPIC, "reset")
+
 
 # ============================
 # CALLBACKS MQTT
@@ -71,19 +94,27 @@ def on_message(client, userdata, msg):
         parse_mode="Markdown"
     )
 
+
 # ============================
 # MAIN
 # ============================
 def main():
+    global mqtt_client  # para que los handlers puedan usarlo
+
     # Telegram
     updater = Updater(TELEGRAM_TOKEN, use_context=True)
     dp = updater.dispatcher
 
+    # Registrar comandos
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("estado", estado))
+    dp.add_handler(CommandHandler("encender", encender))
+    dp.add_handler(CommandHandler("apagar", apagar))
+    dp.add_handler(CommandHandler("reset", reset_cmd))
 
-    # MQTT (SIN TLS)
+    # MQTT
     client = mqtt.Client()
+    mqtt_client = client  # guardar referencia global
 
     client.reconnect_delay_set(min_delay=1, max_delay=30)
 
@@ -100,6 +131,7 @@ def main():
 
     while True:
         time.sleep(1)
+
 
 if __name__ == "__main__":
     main()
