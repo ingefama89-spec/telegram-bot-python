@@ -61,7 +61,7 @@ def on_message(client, userdata, msg):
 
 def main():
     # Telegram
-    updater = Updater(TELEGRAM_TOKEN, use_context=True)
+    updater = Updater(TELEGRAM_TOKEN, use_context=True, job_queue=None)
     dp = updater.dispatcher
 
     # Registrar comandos
