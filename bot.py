@@ -11,11 +11,8 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 MQTT_BROKER = os.getenv("MQTT_BROKER")
-MQTT_PORT = int(os.getenv("MQTT_PORT", 8883))
+MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC")
-
-MQTT_USER = os.getenv("MQTT_USER")
-MQTT_PASS = os.getenv("MQTT_PASS")
 
 # ============================
 # HANDLERS DE TELEGRAM
@@ -56,13 +53,11 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("estado", estado))
 
-    # MQTT
+    # MQTT (SIN TLS)
     client = mqtt.Client()
-    client.tls_set()  # TLS obligatorio para HiveMQ Cloud
-    client.username_pw_set(MQTT_USER, MQTT_PASS)
-    
+
     client.reconnect_delay_set(min_delay=1, max_delay=30)
-    
+
     client.on_connect = on_connect
     client.on_message = on_message
 
