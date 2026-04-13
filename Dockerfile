@@ -3,6 +3,7 @@ FROM python:3.10-slim
 WORKDIR /app
 
 RUN pip install --no-cache-dir --upgrade pip uv==0.5.29
+RUN pip install --no-cache-dir setuptools
 
 ENV UV_PYTHON_DOWNLOADS=never \
     UV_COMPILE_BYTECODE=1 \
