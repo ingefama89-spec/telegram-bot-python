@@ -64,7 +64,7 @@ def main():
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    client.connect(MQTT_BROKER, MQTT_PORT, keepalive=20)
 
     # Iniciar servicios
     updater.start_polling()
