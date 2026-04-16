@@ -44,7 +44,6 @@ def estado(update, context):
     if mqtt_client:
         mqtt_client.publish(MQTT_COMMAND_TOPIC, "estado")
 
-    # Timeout de 3 segundos
     context.job_queue.run_once(verificar_timeout, 3, context=chat_id_estado)
 
 
@@ -77,6 +76,12 @@ def reset_cmd(update, context):
         mqtt_client.publish(MQTT_COMMAND_TOPIC, "reset")
 
 
+def llenar(update, context):
+    update.message.reply_text("🚰 Iniciando modo llenado (comando enviado por MQTT).")
+    if mqtt_client:
+        mqtt_client.publish(MQTT_COMMAND_TOPIC, "llenar")
+
+
 # ============================
 # CALLBACKS MQTT
 # ============================
@@ -91,7 +96,6 @@ def on_message(client, userdata, msg):
     mensaje_raw = msg.payload.decode()
     print("Mensaje MQTT recibido:", mensaje_raw)
 
-    # Intentar parsear JSON
     try:
         data = json.loads(mensaje_raw)
         sensor = data.get("sensor", "Desconocido")
@@ -105,7 +109,6 @@ def on_message(client, userdata, msg):
         mensaje = mensaje_raw
         data = {}
 
-    # Fecha y hora actual
     from datetime import datetime
     fecha = datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -117,14 +120,12 @@ def on_message(client, userdata, msg):
     if esperando_respuesta and tipo == "Estado":
         esperando_respuesta = False
 
-        # Tiempo total de funcionamiento
         try:
             tiempo_ms = int(data.get("tiempo_total_bomba_ms", 0))
             minutos_bomba = round(tiempo_ms / 60000, 2)
         except:
             minutos_bomba = "N/A"
 
-        # Última vez encendida
         try:
             ultima = int(data.get("ultima_vez_encendida", 0))
             if ultima > 0:
@@ -152,6 +153,24 @@ def on_message(client, userdata, msg):
         bot.send_message(
             chat_id=CHAT_ID,
             text=texto_estado,
+            parse_mode="Markdown"
+        )
+        return
+
+    # ============================
+    # MENSAJE ESPECIAL: BLOQUEADO POR MANTENIMIENTO
+    # ============================
+    if tipo == "Bloqueado":
+        texto_bloqueo = (
+            f"🔧 *Modo mantenimiento activo*\n"
+            f"📅 *Fecha:* {fecha}\n\n"
+            f"🚫 *Comando bloqueado por interruptor físico*\n"
+            f"🔔 *Mensaje:* {mensaje}"
+        )
+
+        bot.send_message(
+            chat_id=CHAT_ID,
+            text=texto_bloqueo,
             parse_mode="Markdown"
         )
         return
@@ -189,6 +208,7 @@ def main():
     dp.add_handler(CommandHandler("encender", encender))
     dp.add_handler(CommandHandler("apagar", apagar))
     dp.add_handler(CommandHandler("reset", reset_cmd))
+    dp.add_handler(CommandHandler("llenar", llenar))
 
     client = mqtt.Client()
     mqtt_client = client
